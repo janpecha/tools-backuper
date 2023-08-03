@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# app config
+export GOMAXPROCS=1 # limits cpu cores
+scriptDir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
+
+# init
+if [ "$1" == "init" ]
+then
+	echo "~ CREATING"
+	"$scriptDir"/restic --verbose init -o s3.storage-class=STANDARD_IA
+	exit 0
+fi
+
+# create backup
+if [ "$1" == "create" ]
+then
+	if [ "$2" != "" ]
+	then
+		"$scriptDir"/restic backup $2 -o s3.storage-class=STANDARD_IA --exclude-caches --exclude-if-present do-not-backup --exclude=".git" --one-file-system
+		exit 0
+	else
+		echo "aws-backup create <path-for-backup>"
+		echo "    <path-for-backup>   example: /dir/path-for-backup"
+		echo ""
+		echo "~ Missing argument 'path-for-backup'"
+		exit 1
+	fi
+fi
+
+# restore
+if [ "$1" == "restore" ]
+then
+	if [ "$2" != "" ]
+	then
+		if [ "$3" != "" ]
+		then
+			if [ "$4" != "" ]
+			then
+				if [ "$5" != "" ]
+				then
+					"$scriptDir"/restic restore $2:$3/`dirname $5` --path $3 --target $4 --include `basename $5`
+				else
+					"$scriptDir"/restic restore $2:$3 --path $3 --target $4
+				fi
+				exit 0
+			else
+				echo "~ Missing argument 'target-directory'"
+				exit 1
+			fi
+		else
+			echo "~ Missing argument 'path-for-backup'"
+			exit 1
+		fi
+	else
+		echo "aws-backup restore <snapshot> <path-for-backup> <target-directory> [<subitem>]"
+		echo "    <snapshot>         example: latest, latest:/subfolder"
+		echo "    <path-for-backup>  example: /dir/path-for-backup"
+		echo "    <target-directory> example: /tmp/restored-data"
+		echo "    <subitem>          example: /my/app/folder or /my/file.txt"
+		echo ""
+		echo "~ Missing argument 'snapshot'"
+		exit 1
+	fi
+fi
+
+# list snapshots
+if [ "$1" == "list" ]
+then
+	echo ${BASH_SOURCE[0]}
+	"$scriptDir"/restic snapshots
+	exit 0
+fi
+
+# remove olds
+if [ "$1" == "remove-olds" ]
+then
+	"$scriptDir"/restic forget --keep-within "45d" --prune
+	exit 0
+fi
+
+# update restic
+if [ "$1" == "self-update" ]
+then
+	"$scriptDir"/restic self-update
+	exit 0
+fi
+
+echo "aws-backup <command>"
+echo "    create"
+echo "    restore"
+echo "    list"
+echo "    remove-olds   keeps snapshots created in last 45 days, removes olders"
+echo "    self-update"
+echo "    init"
+echo ""
+echo "~ Unknow command '$1'"
+exit 1
