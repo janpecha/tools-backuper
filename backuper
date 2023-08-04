@@ -83,6 +83,23 @@ then
 	exit 0
 fi
 
+# remove all
+if [ "$1" == "remove-all" ]
+then
+	if [ "$2" != "" ]
+	then
+		"$scriptDir"/restic forget --keep-last 1 --path $2 --prune
+		"$scriptDir"/restic forget latest --path $2 --prune
+		exit 0
+	else
+		echo "aws-backup remove-all <path-for-backup>"
+		echo "    <path-for-backup>   example: /dir/path-for-backup"
+		echo ""
+		echo "~ Missing argument 'path-for-backup'"
+		exit 1
+	fi
+fi
+
 # update restic
 if [ "$1" == "self-update" ]
 then
