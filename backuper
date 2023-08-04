@@ -100,6 +100,28 @@ then
 	fi
 fi
 
+# list files
+if [ "$1" == "list-files" ]
+then
+	if [ "$2" != "" ]
+	then
+		if [ "$3" != "" ]
+		then
+			"$scriptDir"/restic ls latest --path $2 "$2/$3"
+		else
+			"$scriptDir"/restic ls latest --path $2
+		fi
+		exit 0
+	else
+		echo "aws-backup list-files <path-for-backup> [<dir-in-backup>]"
+		echo "    <path-for-backup>   example: /dir/path-for-backup"
+		echo "    <dir-in-backup>     example: /path/to/dir"
+		echo ""
+		echo "~ Missing argument 'path-for-backup'"
+		exit 1
+	fi
+fi
+
 # update restic
 if [ "$1" == "self-update" ]
 then
