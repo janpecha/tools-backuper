@@ -72,7 +72,6 @@ fi
 # list snapshots
 if [ "$1" == "list" ]
 then
-	echo ${BASH_SOURCE[0]}
 	"$scriptDir"/restic snapshots
 	exit 0
 fi
