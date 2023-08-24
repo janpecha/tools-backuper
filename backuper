@@ -18,10 +18,13 @@ then
 	if [ "$2" != "" ]
 	then
 		echo "Path: ${@:2}"
+		if [ ! -f "$scriptDir/exclude.txt" ]; then
+			touch "$scriptDir/exclude.txt"
+		fi
 		"$scriptDir"/restic backup -o s3.storage-class=STANDARD_IA \
 			--exclude-caches \
 			--exclude-if-present do-not-backup \
-			--exclude=".git" \
+			--exclude-file="$scriptDir/exclude.txt" \
 			--one-file-system \
 			--cleanup-cache \
 			$BACKUPER_CREATE_OPTIONS \
