@@ -24,6 +24,7 @@ then
 			--exclude=".git" \
 			--one-file-system \
 			--cleanup-cache \
+			$BACKUPER_CREATE_OPTIONS \
 			"${@:2}"
 		exit 0
 	else
