@@ -17,6 +17,7 @@ if [ "$1" == "create" ]
 then
 	if [ "$2" != "" ]
 	then
+		echo "Path: $2"
 		"$scriptDir"/restic backup $2 -o s3.storage-class=STANDARD_IA \
 			--exclude-caches \
 			--exclude-if-present do-not-backup \
