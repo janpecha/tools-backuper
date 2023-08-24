@@ -18,7 +18,7 @@ then
 	if [ "$2" != "" ]
 	then
 		echo "Path: $2"
-		"$scriptDir"/restic backup $2 -o s3.storage-class=STANDARD_IA \
+		"$scriptDir"/restic backup "$2" -o s3.storage-class=STANDARD_IA \
 			--exclude-caches \
 			--exclude-if-present do-not-backup \
 			--exclude=".git" \
@@ -89,8 +89,8 @@ if [ "$1" == "remove-all" ]
 then
 	if [ "$2" != "" ]
 	then
-		"$scriptDir"/restic forget --keep-last 1 --path $2 --prune
-		"$scriptDir"/restic forget latest --path $2 --prune
+		"$scriptDir"/restic forget --keep-last 1 --path "$2" --prune
+		"$scriptDir"/restic forget latest --path "$2" --prune
 		exit 0
 	else
 		echo "aws-backup remove-all <path-for-backup>"
@@ -108,9 +108,9 @@ then
 	then
 		if [ "$3" != "" ]
 		then
-			"$scriptDir"/restic ls latest --path $2 "$2/$3"
+			"$scriptDir"/restic ls latest --path "$2" "$2/$3"
 		else
-			"$scriptDir"/restic ls latest --path $2
+			"$scriptDir"/restic ls latest --path "$2"
 		fi
 		exit 0
 	else
