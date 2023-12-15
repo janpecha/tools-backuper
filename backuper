@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [[ -z "${BACKUPER_STORAGE_CLASS}" ]]; then
+    BACKUPER_STORAGE_CLASS="STANDARD_IA"
+else
+    BACKUPER_STORAGE_CLASS="${BACKUPER_STORAGE_CLASS}"
+fi
+
 # app config
 export GOMAXPROCS=1 # limits cpu cores
 scriptDir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
@@ -8,7 +14,7 @@ scriptDir=$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")
 if [ "$1" == "init" ]
 then
 	echo "~ CREATING"
-	"$scriptDir"/restic --verbose init -o s3.storage-class=STANDARD_IA
+	"$scriptDir"/restic --verbose init -o s3.storage-class=$BACKUPER_STORAGE_CLASS
 	exit 0
 fi
 
@@ -21,7 +27,7 @@ then
 		if [ ! -f "$scriptDir/exclude.txt" ]; then
 			touch "$scriptDir/exclude.txt"
 		fi
-		"$scriptDir"/restic backup -o s3.storage-class=STANDARD_IA \
+		"$scriptDir"/restic backup -o s3.storage-class=$BACKUPER_STORAGE_CLASS \
 			--exclude-caches \
 			--exclude-if-present do-not-backup \
 			--exclude-file="$scriptDir/exclude.txt" \
